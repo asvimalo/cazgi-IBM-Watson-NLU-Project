@@ -7,76 +7,77 @@ const { IamAuthenticator } = require('ibm-watson/auth');
 dotenv.config();
 const app = new express();
 
-//var router = express.Router();
-//var urlRouter = express.Router();
-//var textRouter = express.Router();
+var router = express.Router();
+var urlRouter = express.Router();
+var textRouter = express.Router();
 
 
-//app.use("/url", urlRouter);
-//app.use("/text", textRouter);
+app.use("/url", urlRouter);
+app.use("/text", textRouter);
 
 
 app.use(express.static('client'));
 app.use(cors_app());
+app.use(express.json());
 
 
 app.get("/",(req,res)=>{
     res.render('index.html');
   });
 
-app.get("/url/emotion", (req,res) => {
+urlRouter.get("/emotion", (req,res) => {
     let url = req.query.url;
-    // let analyzeParams = {
-    //     'url': url,
-    //     'features': {
-    //         'categories': {
-    //         'limit': 3
-    //         }
-    //     }
-    // };
-    // getNLUInstance(analyzeParams);
+    let analyzeParams = {
+        'url': url,
+        'features': {
+            'categories': {
+            'limit': 3
+            }
+        }
+    };
+    getNLUInstance(analyzeParams);
     return res.send({"happy":"90","sad":"10"});
 });
 
-app.get("/url/sentiment", (req,res) => {
+urlRouter.get("/sentiment", (req,res) => {
     let url = req.query.url;
-    // let analyzeParams = {
-    //     'url': url,
-    //     'features': {
-    //         'categories': {
-    //         'limit': 3
-    //         }
-    //     }
-    // };
-    // getNLUInstance(analyzeParams);
+    let analyzeParams = {
+        'url': url,
+        'features': {
+            'categories': {
+            'limit': 3
+            }
+        }
+    };
+    getNLUInstance(analyzeParams);
     return res.send("url sentiment for "+req.query.url);
 });
 
-app.get("/text/emotion", (req,res) => {
-    let text = req.query.text;   
-    // let analyzeParams = {
-    //     'text': text,
-    //     'features': {
-    //         'categories': {
-    //         'limit': 3
-    //         }
-    //     }
-    // };
-    // getNLUInstance(analyzeParams);
+textRouter.get("/emotion", (req,res) => {
+    let text = req.query.text;
+    console.log(text);   
+    let analyzeParams = {
+        'text': text,
+        'features': {
+            'entities': {
+                'emotion': true,
+                'sentiment': false
+            }
+        }
+    };
+    getNLUInstance(analyzeParams);
     return res.send({"happy":"10","sad":"90"});
 });
 
-app.get("/text/sentiment", (req,res) => {
+textRouter.get("/sentiment", (req,res) => {
     let text = req.query.text;   
-    // let analyzeParams = {
-    //     'text': text,
-    //     'features': {
-    //         'categories': {
-    //         'limit': 3
-    //         }
-    //     }
-    // };
-    // getNLUInstance(analyzeParams);
+    let analyzeParams = {
+        'text': text,
+        'features': {
+            'sentiment': true
+        }
+    };
+    getNLUInstance(analyzeParams);
     return res.send("text sentiment for "+req.query.text);
 });
 
@@ -97,10 +98,9 @@ function getNLUInstance(analyzeParams){
     });
 
     
-    naturalLanguageUnderstanding.analyze(analyzeParams)
-        .then(analysisResults => {
-            console.log(JSON.stringify(analysisResults, null, 2));
-        })
+     return naturalLanguageUnderstanding.analyze(analyzeParams)
+        .then(analysisResults => analysisResults.result)
+        .then(data => console.log(data))
         .catch(err => {
             console.log('error:', err);
         });
