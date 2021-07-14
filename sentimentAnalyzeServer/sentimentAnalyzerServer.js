@@ -69,7 +69,7 @@ urlRouter.get("/sentiment", (req,res) => {
     getNLUInstance(analyzeParams)
     .then(entities => {
         console.log(entities.sentiment)
-        res.send({sentiments:entities.sentiment});
+        res.send({sentiment:entities.sentiment.label});
     })
     .catch(err => res.send(err));
 });
@@ -118,7 +118,7 @@ textRouter.get("/sentiment", (req,res) => {
     getNLUInstance(analyzeParams)
     .then(entities => {
         console.log(entities.sentiment)
-        res.send({sentiments:entities.sentiment});
+        res.send({sentiments:entities.sentiment.label});
     })
     .catch(err => res.send(err));
 });
