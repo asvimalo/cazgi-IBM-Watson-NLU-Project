@@ -30,13 +30,24 @@ urlRouter.get("/emotion", (req,res) => {
     let analyzeParams = {
         'url': url,
         'features': {
-            'categories': {
-            'limit': 3
+            'entities': {
+                'emotion': true,
+                'sentiment': false
+                
+            },
+            'keywords': {
+                'emotion': true,
+                'sentiment': false
             }
         }
     };
-    getNLUInstance(analyzeParams);
-    return res.send({"happy":"90","sad":"10"});
+    getNLUInstance(analyzeParams)
+    .then(entities => {
+        console.log(entities.emotion)
+        res.send({emotions:entities.emotion});
+    })
+    .catch(err => res.send(err));
+    
 });
 
 urlRouter.get("/sentiment", (req,res) => {
@@ -44,13 +55,23 @@ urlRouter.get("/sentiment", (req,res) => {
     let analyzeParams = {
         'url': url,
         'features': {
-            'categories': {
-            'limit': 3
+            'entities': {
+                'emotion': false,
+                'sentiment': true
+                
+            },
+            'keywords': {
+                'emotion': false,
+                'sentiment': true
             }
         }
     };
-    getNLUInstance(analyzeParams);
-    return res.send("url sentiment for "+req.query.url);
+    getNLUInstance(analyzeParams)
+    .then(entities => {
+        console.log(entities.sentiment)
+        res.send({sentiments:entities.sentiment});
+    })
+    .catch(err => res.send(err));
 });
 
 textRouter.get("/emotion", (req,res) => {
@@ -62,11 +83,20 @@ textRouter.get("/emotion", (req,res) => {
             'entities': {
                 'emotion': true,
                 'sentiment': false
+                
+            },
+            'keywords': {
+                'emotion': true,
+                'sentiment': false
             }
         }
     };
-    getNLUInstance(analyzeParams);
-    return res.send({"happy":"10","sad":"90"});
+    getNLUInstance(analyzeParams)
+    .then(entities => {
+        console.log(entities.emotion)
+        res.send({emotions:entities.emotion});
+    })
+    .catch(err => res.send(err));
 });
 
 textRouter.get("/sentiment", (req,res) => {
@@ -74,11 +104,23 @@ textRouter.get("/sentiment", (req,res) => {
     let analyzeParams = {
         'text': text,
         'features': {
-            'sentiment': true
+            'entities': {
+                'emotion': false,
+                'sentiment': true
+                
+            },
+            'keywords': {
+                'emotion': false,
+                'sentiment': true
+            }
         }
     };
-    getNLUInstance(analyzeParams);
-    return res.send("text sentiment for "+req.query.text);
+    getNLUInstance(analyzeParams)
+    .then(entities => {
+        console.log(entities.sentiment)
+        res.send({sentiments:entities.sentiment});
+    })
+    .catch(err => res.send(err));
 });
 
 let server = app.listen(8080, () => {
@@ -99,9 +141,12 @@ function getNLUInstance(analyzeParams){
 
     
      return naturalLanguageUnderstanding.analyze(analyzeParams)
-        .then(analysisResults => analysisResults.result)
-        .then(data => console.log(data))
+        .then(analysisResults => {
+            console.log(JSON.stringify(analysisResults, null, 2))
+            return analysisResults.result.entities[0];
+        })
         .catch(err => {
             console.log('error:', err);
+            return err;
         });
 }
