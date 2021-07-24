@@ -118,7 +118,7 @@ textRouter.get("/sentiment", (req,res) => {
     getNLUInstance(analyzeParams)
     .then(entities => {
         console.log(entities.sentiment)
-        res.send({sentiments:entities.sentiment.label});
+        res.send({sentiment:entities.sentiment.label});
     })
     .catch(err => res.send(err));
 });
@@ -142,7 +142,7 @@ function getNLUInstance(analyzeParams){
     
      return naturalLanguageUnderstanding.analyze(analyzeParams)
         .then(analysisResults => {
-            console.log(JSON.stringify(analysisResults, null, 2))
+            //console.log(JSON.stringify(analysisResults, null, 2))
             return analysisResults.result.entities[0];
         })
         .catch(err => {
